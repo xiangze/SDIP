@@ -24,7 +24,12 @@ class SDIP_top extends Module{
 
 val imem= Module (new SDIP_imem)
 val sequencer= Module (new SDIP_STM)
+
 val weightram= Module (new SDIP_PSRAM)
+
+val dsram_sel=RegInit(Bool)
+val dsram0= Module (new SDIP_DSRAM)
+val dsram1= Module (new SDIP_DSRAM)
 
 //dedicaded image encoder to latent variable
 val encoder= Module (new SDIP_VEAencoder)
@@ -34,6 +39,12 @@ val encoder= Module (new SDIP_VEAencoder)
     val core = Module (new SDIP_core)
     core
   }
+
+//parameter registers
+val beta_t=RegInit(UInt)
+val sigma_t=RegInit(UInt)
+val t=RegInit(UInt)
+val sint=RegInit(UInt)
 
 //dedicaded image decoder from latent variable
 val decoder= Module (new SDIP_VEAdecoder)
