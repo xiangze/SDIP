@@ -1,11 +1,15 @@
 # Stable Diffusion専用プロセッサのアーキテクチャに関する試論
 
 ## 概要
-画像生成などで使われるアルゴリズムであるStable Diffusionの生成処理を高スループットで実行するための回路アーキテクチャSDIPを提唱する。
-またその特性の既存AIアクセラレーターとの比較について述べる。
+画像生成などで使われるアルゴリズムであるStable Diffusionの生成処理をリアルタイム動画変換等目的とした高スループットで実行するための回路アーキテクチャSDIPを提唱する。
+
+またその特性を既存のAIアクセラレーターと比較して述べる。
 
 ## 回路構成と機能
-数多くある拡散モデルのアルゴリズムのうちVAEで圧縮した隠れ変数に対して拡散過程を適用するlatent diffusionの演算のための回路全体を以下に図示する。
+SDIPは数多くある拡散モデルのアルゴリズムのうちVAEで圧縮した隠れ変数に対して拡散過程を適用する[latent diffusion](https://arxiv.org/abs/2112.10752)の演算を特にターゲットとしている。
+
+回路全体の構成を以下に図示する。
+
 ![Stable diffusion dedicated Hardware](../StablediffusionCircuit-HW_Core.png)
 ### モジュール
 |モジュール名|機能|
@@ -21,31 +25,42 @@
 |SDIP_STACKRAM|Resnet, U-netで必要になるResidual変数の保持のためのスタック|
 |SDIP_ALU|各演算器とその出力選択器を含むモジュール|
 
-
 ### 1 coreの動作
 
-実装はhttps://github.com/xiangze/SDIP/blob/main/src/main/scala/sdip/SDIP_core.scala
+実装は https://github.com/xiangze/SDIP/blob/main/src/main/scala/sdip/SDIP_core.scala
 
-onnxファイルから抽出したgraph構造を記述したgraphファイルに基づいて信号op
-分岐がなく順番に読み込まれる機械語に相当し以下のようなフォーマットを持つ。
+onnxファイルから抽出したgraph構造を記述した.graphファイルのPC(program counter)レジスタが指定したある1行をIMEMから読み出し、そのoperationの値に基づいて信号op信号が選択される。
+
+.graphファイルは分岐がなく順番に読み込まれる機械語に相当し以下のような固定長のフォーマットを持つ。
 
 |operation|	src1|	src2|	dst	|src1 size|	src2 size|
 |:----|:----|:----|:----|:----|:----|
 
 src1,src2は前段のcoreの計算結果、STACKRAMに保存されたデータ、gereral registerに保存されたスカラー値を複製したもの、あるいはアドレスを指定することでそれを読み出されるPSRAMの特定のアドレスに保存された重みパラメーター(weight)のいずれかに対応する。src1,src2に対応したそれらをarg1,arg2信号として選択する。PSRAMのアドレスはsrc1 size,	src2 sizeのぶんだけインクリメントする。
+
 operation(op)に従って選択されたconv2d,linear,Transposeその他の演算回路の出力をdataとしてDSRAM、必要であればSTACKRAMに記録する。
-各operationはsrc1 size,	src2 sizeに応じた所要サイクルが有り信号dulationによってそれはカウントされる。完了
-operationが完了すると最終結果が書き込まれたDSRAM1はDSRAM0と交代し、次のgraphの行が読み込まれ動作を繰り返す。
+
+各operationはsrc1 size,	src2 sizeに応じた所要サイクルが有り信号dulationによってそれはカウントされる。
+
+operationが完了すると最終結果が書き込まれたDSRAM1はDSRAM0と交代し、dulationはリセットされ、PCはインクリメントする次のgraphの行が読み込まれ動作を繰り返す。
 
 ### coreのパイプライン動作
 
-実装はhttps://github.com/xiangze/SDIP/blob/main/src/main/scala/sdip/SDIP_top.scala
+実装は https://github.com/xiangze/SDIP/blob/main/src/main/scala/sdip/SDIP_top.scala
+
+入力画像データをVAE(variable autoencoder)のencoderで圧縮し、それに複数ステップの拡散過程を適用し、decoderで画像に戻す。複数ステップの拡散過程を直列したcoreで分担することで動画のようなストリーミング入力をリアルタイムに処理することを目標とする。
+
+各coreでははステップ数t,周期性を表すsin(t),promptをベクトル空間に埋め込んだ$\tau$, 拡散モデルのパラメーターを汎用レジスタに格納し、使用する。
+入力画像をランダムにした場合はtext(prompt)の情報のみから生成するtext to image(t2i)に相当する。
 
 拡散モデルの大きな特徴であるのが複数のstepでデータを生成すること、各ステップで必要になるパラメーターは共通でノイズの分散のみが異なること
 である。このため図のように全く同じ重みパラメーターをPSRAMから各coreに読み出すことができる。ただしVAE encoder,decoderだけは異なるパラメーターを読み出すことになる。必要なstep数に対してcoreの数が足りない場合には1つのcoreが複数のstepの演算を行いその分だけスループットは低下する。
 
 2番目の図はより一般的な状況として処理ごとに所要サイクルが異なる場合である。この場合スループットは最も時間がかかる処理に律速される。
 
+.graphファイルは　また論理的には分岐があっても
+.graph論理的には分岐があっても
+ディープラーニングにおける分岐は確率的なも
 
 ![SDIP pipeline](../StablediffusionCircuit-pipeline.png)
 
@@ -61,7 +76,7 @@ operationが完了すると最終結果が書き込まれたDSRAM1はDSRAM0と�
 |mul|2|無|0|
 |div|2|無|0|
 |rand|0|無|0|
-|root|1|無|0|
+|sqrt|1|無|0|
 |softmax|1|無|0|
 |relu|1|無|0|
 |silu|1|無|0|
@@ -79,6 +94,7 @@ groupnorm,layernormに関しては下図及び[その他参考にしたリンク
 $y=\frac{x−E[x]}{\sqrt{Var[x]+\epsilon}}*\gamma+\beta$
 
 ![groupnorm](../groupnorm.png)
+
 [Group normalization](https://arxiv.org/abs/1803.08494)より引用
 
 これ以外のonnxで定義されたoperationもSDIP_ALU、SDIP_STMに演算、所要サイクルを追加することで拡張可能である。
@@ -107,9 +123,10 @@ FPGAあるいはASIC(専用LSI)、それぞれの製造プロセスによって�
 
 
 ## onnxからのプログラム、重みデータの作成とRAMへの書き込み
-onnxを分離、変換することで命令列(.graph), パラメーターを並べたバイナリ(.weight)を作り前者はIMEM、後者はDRAMへとデータ処理前に書き込む。データ生成実行時にgraphの各行を
-同時に使用するデータは
-Residual dataに対してはgraphの行に印をつけることでSTACKRAMへの読み書きを支持するようにする。
+onnxを分離、変換することで命令列(.graph), パラメーターを並べたバイナリ(.weight)を作り前者はIMEM、後者はDRAMへとデータ処理前に書き込む。データ生成実行時にgraphの各行読みそのoperation,src,dstに基づいて演算、用いるデータ、パラメーターを決めるのは上述のとおりである。
+graph作成時onnxに現れるデータをPSRAMの特定の場所に割り当てる工程はコンパイラのレジスタ割付に相当する。
+
+Residual dataに対してはgraphの行に印をつけることでSTACKRAMへの読み書きを指示するようにする。
 
 ## 発展的機能実装
 現状のSDIPとそのonnx converterでは実装していないが機能、効率化の観点から重要な事項を列挙する。
