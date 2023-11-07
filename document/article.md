@@ -1,10 +1,11 @@
 # Stable Diffusion専用プロセッサのアーキテクチャに関する試論
 
 ## 概要
-画像生成などで使われるU-netを用いた拡散モデルStable Diffusionの生成処理を高スループットで実行するためのアーキテクチャSDIPの提示と既存AIアクセラレーターとの比較
+画像生成などで使われるアルゴリズムであるStable Diffusionの生成処理を高スループットで実行するための回路アーキテクチャSDIPを提唱する。
+またその特性の既存AIアクセラレーターとの比較について述べる。
 
 ## 回路構成と機能
-latent diffusion
+数多くある拡散モデルのアルゴリズムのうちVAEで圧縮した隠れ変数に対して拡散過程を適用するlatent diffusionの演算のための回路全体を以下に図示する。
 ![Stable diffusion dedicated Hardware](../StablediffusionCircuit-HW_Core.png)
 ### モジュール
 SDIP_top
