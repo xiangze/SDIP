@@ -11,10 +11,10 @@ class SDIP_top extends Module{
   val image_out=Output(DataType(DATA.W))
   val image_out_valid=Output(Bool)
 
-  //diffusion model parameter  
+  //scalar diffusion model parameters
   val param_in=Input(DataType(DATA.W))
   val param_addr=Input(Uint(4))
-  val param_en=Input(Bool)
+  val param_valid=Input(Bool)
   
   //weight(parameter) from DRAM
   val DRAM_addr=Output(Uint(DRAM_ADDR_WIDTH))
@@ -61,10 +61,13 @@ val decoder= Module (new SDIP_VEAdecoder)
         core(i+1).io.din  := core(i).io.dout
     }
         core(i).io.weight:= weightram.io.dout
-        core(i).io.op:= sequencer.io.op
+        core(i).io.op_arg0:= sequencer.io.op
+        core(i).io.op_arg1:= sequencer.io.op
         core(i).io.op_post:= sequencer.io.op_post
-
-        core(i).io.DSRAM_wen:= sequencer.op_post_change        
+        core(i).io.op_post_change:= sequencer.io.op_post_change
+        
+        core(i).io.dsram_wen:= sequencer.op_post_change        
+        core(i).io.dsram_in:= sequencer.op_post_change                
         core(i).io.STACKRAM_wen:= sequencer.op_post_change        
         core(i).io.DSRAM_addr:= sequencer.io.dulation
         core(i).io.STACKRAM_addr:= sequencer.io.dulation
