@@ -58,9 +58,7 @@ operationが完了すると最終結果が書き込まれたDSRAM1はDSRAM0と�
 
 2番目の図はより一般的な状況として処理ごとに所要サイクルが異なる場合である。この場合スループットは最も時間がかかる処理に律速される。
 
-.graphファイルは　また論理的には分岐があっても
-.graph論理的には分岐があっても
-ディープラーニングにおける分岐は確率的なも
+.graphファイルは通常の機械語と異なり分岐命令、ループは存在しない。onnxの論理的にはループがあってもそれを展開したもののみを受け入れることとする。
 
 ![SDIP pipeline](../StablediffusionCircuit-pipeline.png)
 
@@ -184,7 +182,7 @@ CPUを含む一般のクロック同期回路と同様に組み合わせ回路�
 
 ## 他アーキテクチャとの類似点、相違点とアルゴリズムとの関係性
 特にサーバー、クラウドを標榜したものだと[GoogleのTPU]( https://cloud.google.com/tpu/docs/intro-to-tpu?hl=ja)
-、[QuadricのChimera GPNPU]()、[Tesla のDojo]()、[tensortorrentのRISC-Vベースのマルチコアプロセッサ]、[graphcoreのIPU]()などがある。これらは拡散モデルも含む大規模なニューラルネット　多くはonnxインターフェースに加えpytorch等のディープラーニング記述を
+、[QuadricのChimera GPNPU]()、[Tesla のDojo]()、[tensortorrentのRISC-Vベースのマルチコアプロセッサ](https://tenstorrent.com/risc-v/)、[graphcoreのIPU]()などがある。これらは拡散モデルも含む大規模なニューラルネット　多くはonnxインターフェースに加えpytorch等のディープラーニング記述を
 類似のAIアクセラレーターでは
 tensortorrentはCUDAとpytorchのバックエンドcupy(PFNによってメンテナンスされている)を置き換えるようなBUDAの開発を標榜している。
 画像等を処理するCNNの高速化、低消費電力化のためには隣接するコアでメモリ、レジスタを共有するアーキテクチャが組み込み系では特によく見られる。
