@@ -18,9 +18,9 @@ Stable diffusion dedicated Hardware with multiple pipelined processor cores
 - SDIP_STACKRAM stack ram for Resnet and U-net
 
 # Document
-document/article_en.md
+[article_en.md](document/article_en.md)
 
-document/article_jp.md
+[article_jp.md](document/article_jp.md)
 
 # How to make and test
 
