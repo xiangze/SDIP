@@ -42,7 +42,7 @@ operation(op)に従って選択されたconv2d,linear,Transposeその他の演�
 
 各operationはsrc1 size,	src2 sizeに応じた所要サイクルが有り信号dulationによってそれはカウントされる。
 
-operationが完了すると最終結果が書き込まれたDSRAM1はDSRAM0と交代し、dulationはリセットされ、PCはインクリメントする次のgraphの行が読み込まれ動作を繰り返す。
+operationが完了すると最終結果が書き込まれたDSRAM1はDSRAM0と交代し、dulationはリセットされ、PCはインクリメントして次のgraphの行が読み込まれ動作を繰り返す。DSRAM、STACKRAMのアドレスはsrc1,src2のsizeから計算されたdstのsizr分だけインクリメントする。
 
 ### coreのパイプライン動作
 
