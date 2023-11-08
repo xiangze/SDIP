@@ -182,7 +182,7 @@ CPUを含む一般のクロック同期回路と同様に組み合わせ回路�
 
 ## 他アーキテクチャとの類似点、相違点とアルゴリズムとの関係性
 特にサーバー、クラウドを標榜したものだと[GoogleのTPU]( https://cloud.google.com/tpu/docs/intro-to-tpu?hl=ja)
-、[QuadricのChimera GPNPU]()、[Tesla のDojo]()、[tensortorrentのRISC-Vベースのマルチコアプロセッサ](https://tenstorrent.com/risc-v/)、[graphcoreのIPU]()などがある。これらは拡散モデルも含む大規模なニューラルネットの学習、推論、生成処理を行うためのものである。多くはonnxインターフェースに加えpytorch等のディープラーニング記述をサポートしている。
+、[PFNのMN-Core](https://projects.preferred.jp/mn-core/)[QuadricのChimera GPNPU]()、[Tesla のDojo]()、[tensortorrentのRISC-Vベースのマルチコアプロセッサ](https://tenstorrent.com/risc-v/)、[graphcoreのIPU]()などがある。これらは拡散モデルも含む大規模なニューラルネットの学習、推論、生成処理を行うためのものである。多くはonnxインターフェースに加えpytorch等のディープラーニング記述をサポートしている。
 Quadricはc++によるプログラミングがサポートされ、tensortorrentはCUDAとpytorchのバックエンドcupy(PFNによってメンテナンスされている)を置き換えるようなBUDAの開発を標榜している。
 
 画像等を処理するCNNの高速化、低消費電力化のためには隣接するコアでメモリ、レジスタを共有するアーキテクチャが組み込み系では特によく見られる。
