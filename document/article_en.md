@@ -45,7 +45,7 @@ The outputs of conv2d, linear, transpose and other arithmetic circuits selected 
 
 Each operation requires cycles according to src1 size and src2 size, which are counted by the dulation signal.
 
-When the operation is completed, DSRAM1, in which the final result is written, is replaced by DSRAM0, the dulation is reset, PC is incremented, the next graph row is read, and the operation is repeated. The addresses of DSRAM and STACKRAM are incremented by the sizr of dst calculated from the size of src1 and src2.
+When the operation is completed, DSRAM1, in which the final result is written, is replaced by DSRAM0, the dulation is reset, PC is incremented, the next graph row is read, and the operation is repeated. The addresses of DSRAM and STACKRAM are incremented by the size of dst calculated from the size of src1 and src2.
 
 
 ### core pipeline operation
@@ -156,7 +156,7 @@ In LLMs, it has been reported that even 4 bits can provide acceptable accuracy [
 The impact on accuracy is considered to be small compared to quantization. There are ways to have another circuit, such as a CPU, perform the operations of dynamic matrix factorization and decompression of compressed parameters.
 
 ### Sparse Matrix, Tensor Support.
-[Hardware-Software Co-Design of an In-Memory Transformer Network Accelerator](https://www.frontiersin.org/articles/10.3389/felec.2022.847069/full) implements a function to transform sparse matrix products used in the Transformer, Attension (attention mechanism) and reports a reduction in the amount of operations.
+[Hardware-Software Co-Design of an In-Memory Transformer Network Accelerator](https://www.frontiersin.org/articles/10.3389/felec.2022.847069/full) implements a function to transform sparse matrix products used in the Transformer, attention mechanism and reports a reduction in the amount of operations.
 
 ### Reduction of circuit size
 It is redundant to have parallel sum-of-products operators in each arithmetic circuit. The circuit scale can be reduced by sharing them.
@@ -202,7 +202,7 @@ Such characteristics of latent diffusion can be assumed to be the result of a hi
 In the identification and generation process using a large number of parameters obtained by deep learning, the bandwidth required to read huge parameters from memory is likely to become a bottleneck. Among them, RNN networks such as LSTM, which repeatedly use the same parameters while changing the data, are expected to have high compatibility with hardware architectures, but the history of research and development with GPUs has shown that the opposite is true: the choice was made to use huge matrix products in Attention. It cannot be simply said that a diffusion model that uses the same parameters in multiple steps in a slightly different manner is more performance efficient for limited memory bandwidth, but it may be said that it is able to capture features of data with a self-similar structure such as images in the learning process.
 
 ## Summary
-In this paper, we have described an example of the configuration and operation of a dedicated Stable Diffusion processor and listed the issues to be considered when implementing the processor. The features are
+In this essay, we have described an example of the configuration and operation of a dedicated Stable Diffusion processor and listed the issues to be considered when implementing the processor. The features are
 - Circuit structure that does not require crossbar, branch prediction, and stall by series operation.
 - Since only the generation process is performed, the weight parameters are only read from DRAM, eliminating the need for a cache.
 - The same parameters are used for all steps and cores in the diffusion model execution.
