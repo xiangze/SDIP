@@ -192,8 +192,8 @@ From the viewpoint of functional coherence, it is easier to understand if each o
 
 ## Similarities and differences with other architectures and their relationship to algorithms
 Especially for server and cloud advocacy, [Google's TPU](https://cloud.google.com/tpu/docs/intro-to-tpu?hl=ja)
-PFN's MN-Core](https://projects.preferred.jp/mn-core/)[quadric's Chimera GPNPU](https://quadric.io/),
-[Quadric's Chimera GPNPU](), [Tesla's Dojo](https://www.tesla.com/ja_jp/AI), [tensortorrent's RISC-V based multi-core processor](https://tenstorrent.com /risc-v/), and [graphcore's IPU](graphcore.ai/en-us/). These are for training, inference, and generative processing of large neural nets, including diffusion models. Many of them support deep learning descriptions such as pytorch in addition to the onnx interface.
+PFN's MN-Core](https://projects.preferred.jp/mn-core/), [quadric's Chimera GPNPU](https://quadric.io/),
+[Tesla's Dojo](https://www.tesla.com/ja_jp/AI), [tensortorrent's RISC-V based multi-core processor](https://tenstorrent.com /risc-v/), and [graphcore's IPU](graphcore.ai/en-us/). These are for training, inference, and generative processing of large neural nets, including diffusion models. Many of them support deep learning descriptions such as pytorch in addition to the onnx interface.
 Quadric supports programming in c++, and tensortorrent advocates the development of BUDA to replace CUDA and pytorch backend cupy (maintained by PFN).
 
 In order to increase the speed and reduce the power consumption of CNNs that process images, etc., architectures that share memory and registers among neighboring cores are often used, especially in embedded systems. SDIP, on the other hand, completes linear computational graph operations within a single core and uses hardware parallelism not for data parallelism but for pipelining and throughput improvement. It is highly compatible with latent diffusion configurations that use VAE to compress images into smaller dimensional latent variable spaces, while at the same time being constrained by its limitations.
